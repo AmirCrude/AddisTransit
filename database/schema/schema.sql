@@ -5,7 +5,7 @@ COLLATE utf8mb4_unicode_ci;
 
 -- Create user and grant privileges
 CREATE USER 'addis_transit'@'localhost'
-IDENTIFIED BY 'addis_transit_1234';
+IDENTIFIED BY 'DB_PASSWORD_PLACEHOLDER';
 GRANT ALL PRIVILEGES ON addis_transit.* TO 'addis_transit'@'localhost';
 FLUSH PRIVILEGES;
 
