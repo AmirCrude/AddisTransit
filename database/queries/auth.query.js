@@ -12,9 +12,8 @@ const getUserByEmail = async (email) => {
       u.phone_number,
       u.password_hash,
       u.role,
-      u.is_verified,
       u.created_at,
-      u.updated_at
+      u.last_login
     FROM users u
     WHERE u.email = ?
     LIMIT 1
@@ -39,7 +38,6 @@ const getUserById = async (id) => {
         email,
         phone_number,
         role,
-        is_verified,
         password_hash
       FROM users
       WHERE user_id = ?
@@ -59,7 +57,7 @@ const getUserById = async (id) => {
 const updateUserPassword = async (email, newPasswordHash) => {
   const sql = `
     UPDATE users 
-    SET password_hash = ?, updated_at = CURRENT_TIMESTAMP
+    SET password_hash = ?
     WHERE email = ?
   `;
 

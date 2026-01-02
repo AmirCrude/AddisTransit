@@ -4,7 +4,7 @@ const { transporter } = require("../../configs/email.config");
 // Send password reset email
 const sendResetTokenEmail = async (email, token) => {
   try {
-    const appName = "Addis_Transit"; // fixed app name
+    const appName = "Addis_Transit";
     const resetUrl = `${process.env.CLIENT_URL}/auth/reset-password?token=${token}`;
 
     await transporter.sendMail({
@@ -61,5 +61,78 @@ If you did not request this, please ignore this email.
     return false;
   }
 };
+const sendAgentWelcomeEmail = async (email, firstName, password) => {
+  try {
+    const appName = "Addis Transit";
+    const loginUrl = `${process.env.CLIENT_URL}/auth/login`;
 
-module.exports = { sendResetTokenEmail };
+    await transporter.sendMail({
+      from: `"${appName}" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: `${appName} | Welcome to Addis Transit`,
+      text: `
+Dear ${firstName},
+
+Welcome to ${appName} transportation portal.
+
+Your account has been created successfully.
+
+Login credentials:
+Email: ${email}
+Password: ${password}
+
+Login here: ${loginUrl}
+
+For security reasons, please change your password after your first login.
+
+Regards,
+${appName} Team
+      `,
+      html: `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+  <h2 style="color:#222;">Welcome to ${appName}</h2>
+
+  <p>Dear <strong>${firstName}</strong>,</p>
+
+  <p>Your Addis Transit transportation portal account has been created successfully.</p>
+
+  <p><strong>Login Credentials:</strong></p>
+  <ul>
+    <li><strong>Email:</strong> ${email}</li>
+    <li><strong>Password:</strong> ${password}</li>
+  </ul>
+
+  <p style="margin: 20px 0;">
+    <a href="${loginUrl}"
+       style="
+         background:#0d6efd;
+         color:#ffffff;
+         padding:12px 24px;
+         text-decoration:none;
+         border-radius:6px;
+         display:inline-block;
+       ">
+      Login to Addis Transit
+    </a>
+  </p>
+
+  <p>For security purposes, please change your password after your first login.</p>
+
+  <hr />
+
+  <p style="font-size:12px; color:#999;">
+    © ${new Date().getFullYear()} ${appName}. All rights reserved.
+  </p>
+</div>
+      `,
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Error sending welcome email:", error.message);
+    return false;
+  }
+};
+
+
+module.exports = { sendResetTokenEmail, sendAgentWelcomeEmail };

@@ -16,6 +16,7 @@ const { sendResetTokenEmail } = require("../utils/template/email.template");
 
 const login = async (email, password) => {
   const user = await getUserByEmail(email);
+  
   if (!user) return { success: false, message: "Invalid email or password" };
 
   const isValid = await comparePassword(password, user.password_hash);
@@ -51,7 +52,6 @@ const forgotPassword = async (email) => {
     process.env.JWT_SECRET,
     { expiresIn: "1h" }
   );
-
   await sendResetTokenEmail(email, token);
 
   return { success: true, message: "Reset link sent to your email" };
