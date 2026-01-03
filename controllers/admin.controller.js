@@ -1,26 +1,31 @@
-const adminService = require("../services/admin.service");
+const { createAgentInvite } = require("../services/admin.invite.service");
 
-// Create Ticket Agent (Super Admin only)
-const createTicketAgent = async (req, res) => {
+const createAgentInviteController = async (req, res) => {
   try {
-    // req.body already validated by Joi validator
-    const result = await adminService.createTicketAgent(req.body);
+    const { email } = req.body;
+    const adminId = req.user.id;
+
+    if (!email) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email is required",
+      });
+    }
+
+    const inviteLink = await createAgentInvite(email, adminId);
 
     res.status(201).json({
       status: "success",
-      message:
-        "Ticket Agent created successfully. Password sent via email.",
-      data: result,
+      invite_link: inviteLink,
     });
-  } catch (error) {
-    console.error("Create Ticket Agent Error:", error);
+  } catch (err) {
     res.status(400).json({
       status: "error",
-      message: error.message || "Failed to create ticket agent.",
+      message: err.message,
     });
   }
 };
 
 module.exports = {
-  createTicketAgent,
+  createAgentInvite: createAgentInviteController,
 };

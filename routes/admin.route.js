@@ -2,7 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 // Controller
-const { createTicketAgent } = require("../controllers/admin.controller");
+const {
+  createAgentInvite,
+  // createTicketAgent, // deprecated – do not use
+} = require("../controllers/admin.controller");
 
 // Validator
 const {
@@ -16,14 +19,13 @@ const { checkJson } = require("../middlewares/auth/checkJson.middleware");
 
 // Admin Routes
 
-// Create ticket agent
+// invite ticket agent
 router.post(
-  "/ticket-agent",
+  "/agent-invite",
   authMiddleware,
   requireAdmin,
   checkJson,
-  validateCreateTicketAgent,
-  createTicketAgent
+  createAgentInvite
 );
 
 module.exports = router;

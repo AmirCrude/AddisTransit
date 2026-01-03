@@ -1,43 +1,51 @@
 const express = require("express");
 const router = express.Router();
 
-// Controller
+// Controllers
 const {
   loginUser,
   forgotPassword,
   resetPassword,
   changePassword,
+  registerAgentFromInvite,
 } = require("../controllers/auth.controller");
 
-// Middlewares 
+// Validators
 const {
   loginValidator,
   forgotPasswordValidator,
   resetPasswordValidator,
-  changePasswordValidator, 
+  changePasswordValidator,
 } = require("../middlewares/validators/auth.validate");
 
-// authentication
+// Middlewares
 const { authMiddleware } = require("../middlewares/auth/auth.middleware");
+const { checkJson } = require("../middlewares/auth/checkJson.middleware");
 
-// Auth Routes
+// ================= AUTH ROUTES =================
 
-// login route
+// login
 router.post("/login", loginValidator, loginUser);
 
-
-// forget password
+// forgot password
 router.post("/forgot-password", forgotPasswordValidator, forgotPassword);
 
-// reset password 
+// reset password
 router.post("/reset-password", resetPasswordValidator, resetPassword);
 
-// change password 
+// change password
 router.post(
   "/change-password",
   changePasswordValidator,
   authMiddleware,
   changePassword
+);
+
+// ✅ Agent self-registration via invite (NEW)
+router.post(
+  "/register/agent",
+  checkJson,
+  registerAgentFromInvite
 );
 
 module.exports = router;

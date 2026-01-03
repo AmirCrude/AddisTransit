@@ -1,4 +1,6 @@
 const authService = require("../services/auth.service");
+const { registerAgentFromInvite } = require("../services/agent.register.service");
+
 
 // login
 const loginUser = async (req, res) => {
@@ -88,9 +90,28 @@ const changePassword = async (req, res) => {
   }
 };
 
+// agent registration via invite
+const registerAgentFromInviteController = async (req, res) => {
+  try {
+    await registerAgentFromInvite(req.body);
+
+    res.status(201).json({
+      status: "success",
+      message: "Account created. Check your email for login credentials.",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   loginUser,
   forgotPassword,
   resetPassword,
   changePassword,
+  registerAgentFromInvite: registerAgentFromInviteController,
 };
+
