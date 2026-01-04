@@ -13,6 +13,11 @@ const {
   updateStationStatus,
 } = require("../controllers/admin.controller");
 
+// Validators
+const {
+  validateCreateStation,
+} = require("../middlewares/validators/station.validate");
+
 // Authentication & Role
 const { authMiddleware } = require("../middlewares/auth/auth.middleware");
 const { requireAdmin } = require("../middlewares/auth/admin.auth.middleware");
@@ -37,6 +42,7 @@ router.post(
   authMiddleware,
   requireAdmin,
   checkJson,
+  validateCreateStation,
   createStation
 );
 
@@ -48,26 +54,26 @@ router.get(
   getAllStations
 );
 
-// Get single station
+// Get single station BY NAME (semantic)
 router.get(
-  "/stations/:id",
+  "/stations/:name",
   authMiddleware,
   requireAdmin,
   getStation
 );
 
-// Update station
+// Update station BY NAME
 router.put(
-  "/stations/:id",
+  "/stations/:name",
   authMiddleware,
   requireAdmin,
   checkJson,
   updateStation
 );
 
-// Activate / deactivate station
+// Activate / deactivate station BY NAME
 router.patch(
-  "/stations/:id/status",
+  "/stations/:name/status",
   authMiddleware,
   requireAdmin,
   checkJson,

@@ -53,7 +53,7 @@ const getAllStations = async (req, res) => {
       status: "success",
       data: stations,
     });
-  } catch (error) {
+  } catch {
     res.status(500).json({
       status: "error",
       message: "Server error",
@@ -61,11 +61,11 @@ const getAllStations = async (req, res) => {
   }
 };
 
-// Get single station
+// Get station by NAME
 const getStation = async (req, res) => {
   try {
-    const station = await stationService.fetchStationById(
-      req.params.id
+    const station = await stationService.fetchStationByName(
+      decodeURIComponent(req.params.name)
     );
 
     res.status(200).json({
@@ -83,7 +83,10 @@ const getStation = async (req, res) => {
 // Update station
 const updateStation = async (req, res) => {
   try {
-    await stationService.editStation(req.params.id, req.body);
+    await stationService.editStationByName(
+      decodeURIComponent(req.params.name),
+      req.body
+    );
 
     res.status(200).json({
       status: "success",
@@ -100,11 +103,9 @@ const updateStation = async (req, res) => {
 // Activate / Deactivate station
 const updateStationStatus = async (req, res) => {
   try {
-    const { is_active } = req.body;
-
-    await stationService.changeStationStatus(
-      req.params.id,
-      is_active
+    await stationService.changeStationStatusByName(
+      decodeURIComponent(req.params.name),
+      req.body.is_active
     );
 
     res.status(200).json({
@@ -118,7 +119,6 @@ const updateStationStatus = async (req, res) => {
     });
   }
 };
-
 
 module.exports = {
   createAgentInvite: createAgentInviteController,
