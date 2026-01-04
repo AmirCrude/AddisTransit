@@ -91,4 +91,37 @@ CREATE TABLE stations (
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
+------------------------------------------------------------
+-- BUS STOPS TABLE
+------------------------------------------------------------
+
+CREATE TABLE bus_stops (
+    stop_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    station_id INT NOT NULL,
+
+    name VARCHAR(100) NOT NULL,
+
+    latitude DECIMAL(9,6) NOT NULL,
+    longitude DECIMAL(9,6) NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Relations
+    CONSTRAINT fk_bus_stops_station
+        FOREIGN KEY (station_id)
+        REFERENCES stations(station_id)
+        ON DELETE CASCADE,
+
+    -- Same stop name allowed at different stations
+    UNIQUE KEY uq_station_stop (station_id, name),
+
+    -- Performance
+    KEY idx_stop_location (latitude, longitude)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
