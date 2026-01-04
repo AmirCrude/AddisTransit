@@ -1,6 +1,7 @@
 const { createAgentInvite } = require("../services/admin.invite.service");
 const stationService = require("../services/station.service");
 const busStopService = require("../services/busStop.service");
+const routeService = require("../services/route.service");
 
 const createAgentInviteController = async (req, res) => {
   try {
@@ -203,6 +204,62 @@ const updateBusStopStatus = async (req, res) => {
   }
 };
 
+const createRoute = async (req, res) => {
+  try {
+    const id = await routeService.createRoute(req.body);
+    res.status(201).json({ status: "success", route_id: id });
+  } catch (e) {
+    res.status(400).json({ status: "error", message: e.message });
+  }
+};
+
+const getAllRoutes = async (req, res) => {
+  res.json({ status: "success", data: await routeService.fetchAllRoutes() });
+};
+
+const getRoute = async (req, res) => {
+  try {
+    const route = await routeService.fetchRouteByName(
+      decodeURIComponent(req.params.routeName)
+    );
+    res.json({ status: "success", data: route });
+  } catch (e) {
+    res.status(404).json({ status: "error", message: e.message });
+  }
+};
+
+const updateRoute = async (req, res) => {
+  await routeService.editRoute(
+    decodeURIComponent(req.params.routeName),
+    req.body
+  );
+  res.json({ status: "success", message: "Route updated" });
+};
+
+const updateRouteStatus = async (req, res) => {
+  await routeService.changeRouteStatus(
+    decodeURIComponent(req.params.routeName),
+    req.body.is_active
+  );
+  res.json({ status: "success", message: "Route status updated" });
+};
+
+const addRouteStops = async (req, res) => {
+  await routeService.addStopsToRoute(
+    decodeURIComponent(req.params.routeName),
+    req.body.stops
+  );
+  res.json({ status: "success", message: "Stops added to route" });
+};
+
+const getRouteStops = async (req, res) => {
+  const stops = await routeService.fetchRouteStops(
+    decodeURIComponent(req.params.routeName)
+  );
+  res.json({ status: "success", data: stops });
+};
+
+
 
 module.exports = {
   // agent invites
@@ -220,4 +277,14 @@ module.exports = {
   getStopsByStation,
   updateBusStop,
   updateBusStopStatus,
+
+  // routes
+  createRoute,
+  getAllRoutes,
+  getRoute,
+  updateRoute,
+  updateRouteStatus,
+  addRouteStops,
+  getRouteStops,
+  
 };

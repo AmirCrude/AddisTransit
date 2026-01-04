@@ -17,6 +17,16 @@ const {
   getStopsByStation,
   updateBusStop,
   updateBusStopStatus,
+
+  // Bus routes controllers
+  createRoute,
+  getAllRoutes,
+  getRoute,
+  updateRoute,
+  updateRouteStatus,
+  addRouteStops,
+  getRouteStops,
+  
 } = require("../controllers/admin.controller");
 
 // Validators
@@ -24,14 +34,20 @@ const {
   validateCreateStation,
 } = require("../middlewares/validators/station.validate");
 
+const {
+  validateCreateBusStop,
+} = require("../middlewares/validators/busStop.validate");
+
+const {
+  validateCreateRoute,
+  validateAddRouteStops,
+} = require("../middlewares/validators/route.validate");
+
+
 // Authentication & Role
 const { authMiddleware } = require("../middlewares/auth/auth.middleware");
 const { requireAdmin } = require("../middlewares/auth/admin.auth.middleware");
 const { checkJson } = require("../middlewares/auth/checkJson.middleware");
-
-const {
-  validateCreateBusStop,
-} = require("../middlewares/validators/busStop.validate");
 
 
 // ================= ADMIN ROUTES =================
@@ -128,6 +144,55 @@ router.patch(
   checkJson,
   updateBusStopStatus
 );
+
+// ===== BUS ROUTES =====
+
+router.post(
+  "/routes",
+  authMiddleware,
+  requireAdmin,
+  checkJson,
+  validateCreateRoute,
+  createRoute
+);
+
+router.get("/routes", authMiddleware, requireAdmin, getAllRoutes);
+
+router.get("/routes/:routeName", authMiddleware, requireAdmin, getRoute);
+
+router.put(
+  "/routes/:routeName",
+  authMiddleware,
+  requireAdmin,
+  checkJson,
+  updateRoute
+);
+
+router.patch(
+  "/routes/:routeName/status",
+  authMiddleware,
+  requireAdmin,
+  checkJson,
+  updateRouteStatus
+);
+
+// ROUTE STOPS
+router.post(
+  "/routes/:routeName/stops",
+  authMiddleware,
+  requireAdmin,
+  checkJson,
+  validateAddRouteStops,
+  addRouteStops
+);
+
+router.get(
+  "/routes/:routeName/stops",
+  authMiddleware,
+  requireAdmin,
+  getRouteStops
+);
+
 
 
 module.exports = router;

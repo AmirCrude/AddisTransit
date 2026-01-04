@@ -125,3 +125,52 @@ CREATE TABLE bus_stops (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
 
+------------------------------------------------------------
+-- BUS ROUTES TABLE
+------------------------------------------------------------
+
+CREATE TABLE bus_routes (
+    route_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+
+    UNIQUE KEY uq_route_name (name)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+
+------------------------------------------------------------
+-- ROUTE STOPS (ORDERED STOPS PER ROUTE)
+------------------------------------------------------------
+
+CREATE TABLE route_stops (
+    route_stop_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    route_id INT NOT NULL,
+    stop_id INT NOT NULL,
+
+    stop_order INT NOT NULL,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_route_stops_route
+        FOREIGN KEY (route_id)
+        REFERENCES bus_routes(route_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_route_stops_stop
+        FOREIGN KEY (stop_id)
+        REFERENCES bus_stops(stop_id)
+        ON DELETE CASCADE,
+
+    UNIQUE KEY uq_route_stop_order (route_id, stop_order),
+    UNIQUE KEY uq_route_stop (route_id, stop_id)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
