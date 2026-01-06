@@ -174,3 +174,35 @@ CREATE TABLE route_stops (
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
+
+
+------------------------------------------------------------
+-- BUSES TABLE
+------------------------------------------------------------
+CREATE TABLE buses (
+    bus_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    plate_number VARCHAR(20) NOT NULL,
+    capacity INT NOT NULL,
+
+    route_id INT NULL,
+    assigned_agent_id INT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE KEY uq_bus_plate (plate_number),
+
+    CONSTRAINT fk_bus_route
+        FOREIGN KEY (route_id)
+        REFERENCES bus_routes(route_id)
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_bus_agent
+        FOREIGN KEY (assigned_agent_id)
+        REFERENCES users(user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;

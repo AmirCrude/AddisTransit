@@ -2,6 +2,7 @@ const { createAgentInvite } = require("../services/admin.invite.service");
 const stationService = require("../services/station.service");
 const busStopService = require("../services/busStop.service");
 const routeService = require("../services/route.service");
+const busService = require("../services/bus.service");
 
 const createAgentInviteController = async (req, res) => {
   try {
@@ -260,6 +261,94 @@ const getRouteStops = async (req, res) => {
 };
 
 
+// Create bus
+const createBus = async (req, res) => {
+  try {
+    const busId = await busService.createBus(req.body);
+
+    res.status(201).json({
+      status: "success",
+      bus_id: busId,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+// Get all buses
+const getAllBuses = async (req, res) => {
+  try {
+    const buses = await busService.fetchAllBuses();
+
+    res.status(200).json({
+      status: "success",
+      data: buses,
+    });
+  } catch {
+    res.status(500).json({
+      status: "error",
+      message: "Server error",
+    });
+  }
+};
+
+// Get single bus
+const getBus = async (req, res) => {
+  try {
+    const bus = await busService.fetchBusById(req.params.id);
+
+    res.status(200).json({
+      status: "success",
+      data: bus,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+// Update bus
+const updateBus = async (req, res) => {
+  try {
+    await busService.editBus(req.params.id, req.body);
+
+    res.status(200).json({
+      status: "success",
+      message: "Bus updated",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+// Activate / Deactivate bus
+const updateBusStatus = async (req, res) => {
+  try {
+    const { is_active } = req.body;
+
+    await busService.changeBusStatus(req.params.id, is_active);
+
+    res.status(200).json({
+      status: "success",
+      message: "Bus status updated",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+
 
 module.exports = {
   // agent invites
@@ -287,4 +376,10 @@ module.exports = {
   addRouteStops,
   getRouteStops,
   
+  // buses
+  createBus,
+  getAllBuses,
+  getBus,
+  updateBus,
+  updateBusStatus,
 };

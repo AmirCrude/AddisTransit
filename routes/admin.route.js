@@ -26,29 +26,28 @@ const {
   updateRouteStatus,
   addRouteStops,
   getRouteStops,
+
+  // Buses controllers
+  createBus,
+  getAllBuses,
+  getBus,
+  updateBus,
+  updateBusStatus,
   
 } = require("../controllers/admin.controller");
 
 // Validators
-const {
-  validateCreateStation,
-} = require("../middlewares/validators/station.validate");
-
-const {
-  validateCreateBusStop,
-} = require("../middlewares/validators/busStop.validate");
-
-const {
-  validateCreateRoute,
-  validateAddRouteStops,
-} = require("../middlewares/validators/route.validate");
-
+const { validateCreateStation } = require("../middlewares/validators/station.validate");
+const { validateCreateBusStop } = require("../middlewares/validators/busStop.validate");
+const { validateCreateRoute, validateAddRouteStops } = require("../middlewares/validators/route.validate");
+const { validateCreateBus } = require("../middlewares/validators/bus.validate");
 
 // Authentication & Role
 const { authMiddleware } = require("../middlewares/auth/auth.middleware");
 const { requireAdmin } = require("../middlewares/auth/admin.auth.middleware");
 const { checkJson } = require("../middlewares/auth/checkJson.middleware");
 
+// 
 
 // ================= ADMIN ROUTES =================
 
@@ -192,6 +191,53 @@ router.get(
   requireAdmin,
   getRouteStops
 );
+
+// ================= BUSES =================
+
+// create bus
+router.post(
+  "/buses",
+  authMiddleware,
+  requireAdmin,
+  validateCreateBus,
+  checkJson,
+  createBus
+);
+
+// get all buses
+router.get(
+  "/buses",
+  authMiddleware,
+  requireAdmin,
+  getAllBuses
+);
+
+// get single bus
+router.get(
+  "/buses/:id",
+  authMiddleware,
+  requireAdmin,
+  getBus
+);
+
+// update bus
+router.put(
+  "/buses/:id",
+  authMiddleware,
+  requireAdmin,
+  checkJson,
+  updateBus
+);
+
+// activate / deactivate bus
+router.patch(
+  "/buses/:id/status",
+  authMiddleware,
+  requireAdmin,
+  checkJson,
+  updateBusStatus
+);
+
 
 
 

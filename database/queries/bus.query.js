@@ -1,0 +1,55 @@
+const db = require("../../configs/database.config");
+
+// create bus
+const insertBus = async (data) => {
+  const [result] = await db.query(
+    "INSERT INTO buses SET ?",
+    data
+  );
+  return result.insertId;
+};
+
+// get all buses
+const getAllBuses = async () => {
+    const [rows] = await db.query(`
+      SELECT b.*, r.name AS route_name
+      FROM buses b
+      LEFT JOIN bus_routes r ON b.route_id = r.route_id
+      ORDER BY b.created_at DESC
+    `);
+    return rows;
+  };
+  
+
+// get bus by id
+const getBusById = async (busId) => {
+  const [rows] = await db.query(
+    "SELECT * FROM buses WHERE bus_id = ?",
+    [busId]
+  );
+  return rows[0];
+};
+
+// update bus
+const updateBusById = async (busId, data) => {
+  await db.query(
+    "UPDATE buses SET ? WHERE bus_id = ?",
+    [data, busId]
+  );
+};
+
+// update bus status
+const updateBusStatus = async (busId, isActive) => {
+  await db.query(
+    "UPDATE buses SET is_active = ? WHERE bus_id = ?",
+    [isActive, busId]
+  );
+};
+
+module.exports = {
+  insertBus,
+  getAllBuses,
+  getBusById,
+  updateBusById,
+  updateBusStatus,
+};
