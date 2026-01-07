@@ -7,8 +7,11 @@ const {
     getRoutes,
     getRouteStops,
     getActiveTrips,
-    getRouteSummariesController
-  } = require("../controllers/commuter.controller");
+    getStationSummariesController,
+    getRouteSummariesController,
+    getBuses,
+    getTripsByRoute,
+} = require("../controllers/commuter.controller");
 
 router.get("/stations", getStations);
 router.get("/stations/:id/stops", getStationStops);
@@ -18,8 +21,12 @@ router.get("/routes/:id/stops", getRouteStops);
 
 router.get("/trips/active", getActiveTrips);
 
-  
-  router.get("/routes/summary", getRouteSummariesController);
-  
+router.get("/routes/summary", getRouteSummariesController);
+
+router.get("/stations/summary", getStationSummariesController);
+
+router.get("/buses", getBuses);
+
+router.get("/routes/:routeId/trips", getTripsByRoute );
 
 module.exports = router;

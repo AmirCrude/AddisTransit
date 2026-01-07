@@ -121,14 +121,148 @@ const getRouteSummaries = async () => {
   
     return rows;
   };
+
+  const getStationSummaries = async () => {
+    const [rows] = await db.query(`
+      SELECT
+        s.station_id,
+        s.name AS station_name,
   
+        -- arriving buses count
+        (
+          SELECT COUNT(DISTINCT t.trip_id)
+          FROM trips t
+          JOIN route_stops rs ON rs.route_id = t.route_id
+          JOIN bus_stops bs ON bs.stop_id = rs.stop_id
+          WHERE t.status = 'in_progress'
+            AND rs.stop_order = (
+              SELECT MIN(rs2.stop_order) + 1
+              FROM route_stops rs2
+              WHERE rs2.route_id = t.route_id
+            )
+            AND bs.station_id = s.station_id
+        ) AS arriving_buses,
   
+        -- leaving buses count
+        (
+          SELECT COUNT(DISTINCT t.trip_id)
+          FROM trips t
+          JOIN route_stops rs ON rs.route_id = t.route_id
+          JOIN bus_stops bs ON bs.stop_id = rs.stop_id
+          WHERE t.status = 'in_progress'
+            AND rs.stop_order = (
+              SELECT MIN(rs2.stop_order)
+              FROM route_stops rs2
+              WHERE rs2.route_id = t.route_id
+            )
+            AND bs.station_id = s.station_id
+        ) AS leaving_buses
+  
+      FROM stations s
+      WHERE s.is_active = TRUE
+      ORDER BY s.name;
+    `);
+  
+    return rows;
+  };
+
+  const getBusesForCommuter = async () => {
+    const [rows] = await db.query(`
+      SELECT
+        b.bus_id,
+        b.plate_number,
+        b.is_active,
+  
+        -- active trip id
+        (
+          SELECT t.trip_id
+          FROM trips t
+          WHERE t.bus_id = b.bus_id
+            AND t.status = 'in_progress'
+          LIMIT 1
+        ) AS trip_id,
+  
+        -- active route name
+        (
+          SELECT r.name
+          FROM trips t
+          JOIN bus_routes r ON r.route_id = t.route_id
+          WHERE t.bus_id = b.bus_id
+            AND t.status = 'in_progress'
+          LIMIT 1
+        ) AS route_name
+  
+      FROM buses b
+      WHERE b.is_active = TRUE
+      ORDER BY b.plate_number;
+    `);
+  
+    return rows.map((bus) => ({
+      bus_id: bus.bus_id,
+      plate_number: bus.plate_number,
+      status: bus.is_active ? "active" : "inactive",
+      has_active_trip: !!bus.trip_id,
+      trip_id: bus.trip_id,
+      route_name: bus.route_name,
+    }));
+  };
+
+  const getTripsByRoute = async (routeId) => {
+    const [rows] = await db.query(
+      `
+      SELECT
+        t.trip_id,
+        t.status,
+        t.start_time,
+  
+        b.plate_number AS bus_plate,
+  
+        origin_station.name AS origin,
+        destination_station.name AS destination
+  
+      FROM trips t
+      JOIN buses b ON t.bus_id = b.bus_id
+      JOIN bus_routes r ON t.route_id = r.route_id
+  
+      JOIN route_stops rs_origin
+        ON rs_origin.route_id = r.route_id
+       AND rs_origin.stop_order = (
+          SELECT MIN(stop_order)
+          FROM route_stops
+          WHERE route_id = r.route_id
+       )
+  
+      JOIN bus_stops origin_station
+        ON origin_station.stop_id = rs_origin.stop_id
+  
+      JOIN route_stops rs_dest
+        ON rs_dest.route_id = r.route_id
+       AND rs_dest.stop_order = (
+          SELECT MAX(stop_order)
+          FROM route_stops
+          WHERE route_id = r.route_id
+       )
+  
+      JOIN bus_stops destination_station
+        ON destination_station.stop_id = rs_dest.stop_id
+  
+      WHERE t.route_id = ?
+      ORDER BY t.created_at DESC
+      `,
+      [routeId]
+    );
+  
+    return rows;
+  };
 
 module.exports = {
-  getActiveStations,
-  getStopsByStation,
-  getActiveRoutes,
-  getRouteStops,
-  getActiveTrips,
-  getRouteSummaries
+    getActiveStations,
+    getStopsByStation,
+    getActiveRoutes,
+    getRouteStops,
+    getActiveTrips,
+    getRouteSummaries,
+    getStationSummaries,
+    getBusesForCommuter,
+    getTripsByRoute,
 };

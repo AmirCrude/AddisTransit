@@ -1,4 +1,7 @@
-const {commuterQuery, getRouteSummaries} = require("../database/queries/commuter.query");
+const { 
+    commuterQuery, getRouteSummaries, getStationSummaries, getBusesForCommuter 
+} = require("../database/queries/commuter.query");
+const { fetchTripsByRoute } = require("../services/commuter.service");
 
 const getStations = async (req, res) => {
   res.json({ status: "success", data: await commuterQuery.getActiveStations() });
@@ -46,6 +49,57 @@ const getRouteSummariesController = async (req, res) => {
   }
 };
 
+const getStationSummariesController = async (req, res) => {
+    try {
+      const stations = await getStationSummaries();
+  
+      res.status(200).json({
+        status: "success",
+        data: stations,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Server error",
+      });
+    }
+  };
+
+  
+  const getBuses = async (req, res) => {
+    try {
+      const buses = await getBusesForCommuter();
+  
+      res.status(200).json({
+        status: "success",
+        data: buses,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Server error",
+      });
+    }
+  };
+
+
+const getTripsByRoute = async (req, res) => {
+  try {
+    const trips = await fetchTripsByRoute(req.params.routeId);
+
+    res.status(200).json({
+      status: "success",
+      data: trips,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+
 module.exports = {
     getStations,
     getStationStops,
@@ -53,4 +107,7 @@ module.exports = {
     getRouteStops,
     getActiveTrips,
     getRouteSummariesController,
+    getStationSummariesController,
+    getBuses,
+    getTripsByRoute,
 };
