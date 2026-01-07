@@ -54,6 +54,13 @@ const assignBusToRoute = async (busId, routeId) => {
   );
 };
 
+// assign agent to bus
+const assignAgentToBus = async (busId, agentId) => {
+  await db.query(
+    "UPDATE buses SET assigned_agent_id = ? WHERE bus_id = ?",
+    [agentId, busId]
+  );
+};
 
 module.exports = {
   insertBus,
@@ -62,4 +69,5 @@ module.exports = {
   updateBusById,
   updateBusStatus,
   assignBusToRoute,
+  assignAgentToBus,
 };

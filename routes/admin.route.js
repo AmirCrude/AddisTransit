@@ -36,6 +36,9 @@ const {
 
   // bus assignment controller
   assignBusToRoute,
+
+  // agent assignment controller
+  assignAgentToBus,
   
 } = require("../controllers/admin.controller");
 
@@ -45,6 +48,8 @@ const { validateCreateBusStop } = require("../middlewares/validators/busStop.val
 const { validateCreateRoute, validateAddRouteStops } = require("../middlewares/validators/route.validate");
 const { validateCreateBus } = require("../middlewares/validators/bus.validate");
 const { validateAssignBusToRoute } = require("../middlewares/validators/bus.assign.validate");
+const { validateAssignAgentToBus } = require("../middlewares/validators/bus.assignAgent.validate");
+
 
 // Authentication & Role
 const { authMiddleware } = require("../middlewares/auth/auth.middleware");
@@ -248,6 +253,16 @@ router.post(
   checkJson,
   validateAssignBusToRoute,
   assignBusToRoute
+);
+
+// Assign agent to bus
+router.post(
+  "/buses/assign-agent",
+  authMiddleware,
+  requireAdmin,
+  checkJson,
+  validateAssignAgentToBus,
+  assignAgentToBus
 );
 
 

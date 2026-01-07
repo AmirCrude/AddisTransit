@@ -5,8 +5,10 @@ const {
     updateBusById,
     updateBusStatus,
     assignBusToRoute,
+    assignAgentToBus,
   } = require("../database/queries/bus.query");
 const { getRouteById } = require("../database/queries/route.query");
+const { getUserById } = require("../database/queries/admin.query");
   
   const createBus = async ({ plate_number, capacity }) => {
     if (!plate_number || !capacity) {
@@ -57,8 +59,29 @@ const { getRouteById } = require("../database/queries/route.query");
   
     await assignBusToRoute(bus_id, route_id);
   };
+
+  const assignAgentToBusService = async ({ bus_id, agent_id }) => {
+    if (!bus_id || !agent_id) {
+      throw new Error("bus_id and agent_id are required");
+    }
   
+    const bus = await getBusById(bus_id);
+    if (!bus) throw new Error("Bus not found");
   
+    const agent = await getUserById(agent_id);
+    if (!agent) throw new Error("User not found");
+  
+    if (agent.role !== "ticket_agent") {
+      throw new Error("User is not a ticket agent");
+    }
+  
+    if (!bus.route_id) {
+      throw new Error("Bus must be assigned to a route before assigning an agent");
+    }
+  
+    await assignAgentToBus(bus_id, agent_id);
+  };
+    
   module.exports = {
     createBus,
     fetchAllBuses,
@@ -66,5 +89,6 @@ const { getRouteById } = require("../database/queries/route.query");
     editBus,
     changeBusStatus,
     assignRouteToBus,
+    assignAgentToBusService,
   };
   

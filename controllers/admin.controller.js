@@ -2,9 +2,9 @@ const { createAgentInvite } = require("../services/admin.invite.service");
 const stationService = require("../services/station.service");
 const busStopService = require("../services/busStop.service");
 const routeService = require("../services/route.service");
-const { assignRouteToBus, busService } = require("../services/bus.service");
+const { assignRouteToBus, busService, assignAgentToBusService } = require("../services/bus.service");
 
-
+// Create agent invite
 const createAgentInviteController = async (req, res) => {
   try {
     const { email } = req.body;
@@ -366,6 +366,22 @@ const assignBusToRouteController = async (req, res) => {
   }
 };
 
+// Assign agent to bus
+const assignAgentToBus = async (req, res) => {
+  try {
+    await assignAgentToBusService(req.body);
+
+    res.status(200).json({
+      status: "success",
+      message: "Agent assigned to bus successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   // agent invites
@@ -402,5 +418,8 @@ module.exports = {
 
   // assign bus to route
   assignBusToRoute: assignBusToRouteController,
+
+  // assign agent to bus
+  assignAgentToBus,
 
 };
