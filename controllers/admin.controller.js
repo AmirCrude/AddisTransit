@@ -4,6 +4,10 @@ const busStopService = require("../services/busStop.service");
 const routeService = require("../services/route.service");
 const { assignRouteToBus, busService, assignAgentToBusService } = require("../services/bus.service");
 const activityService = require("../services/activity.service");
+const tripService = require("../services/trip.service");
+const { getAllTrips } = require("../database/queries/trip.query");
+// const { get } = require("../routes/agent.route");
+
 
 // Create agent invite
 const createAgentInviteController = async (req, res) => {
@@ -401,6 +405,42 @@ const getAllActivityLogs = async (req, res) => {
   }
 };
 
+// View all trips
+const viewAllTrips = async (req, res) => {
+  try {
+    const trips = await getAllTrips();
+
+    res.status(200).json({
+      status: "success",
+      data: trips,
+    });
+  } catch {
+    res.status(500).json({
+      status: "error",
+      message: "Server error",
+    });
+  }
+};
+
+// Get single trip by ID (admin read-only)
+const getTripById = async (req, res) => {
+  try {
+    const trip = await tripService.fetchTripByIdForAdmin(req.params.id);
+
+    res.status(200).json({
+      status: "success",
+      data: trip,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+
+
 module.exports = {
   // agent invites
   createAgentInvite: createAgentInviteController,
@@ -442,5 +482,9 @@ module.exports = {
 
   // activity logs
   getAllActivityLogs,
+
+  // trips
+  viewAllTrips,
+  getTripById,
 };
 

@@ -42,6 +42,12 @@ const {
   
   // Activity logs controller
   getAllActivityLogs,
+
+  // Trips controller
+  viewAllTrips,
+
+  // Trip details controller
+  getTripById,
   
 } = require("../controllers/admin.controller");
 
@@ -276,6 +282,26 @@ router.get(
   authMiddleware,
   requireAdmin,
   getAllActivityLogs
+);
+
+// ================= TRIPS =================
+
+
+// view trips (read-only)
+router.get(
+  "/trips",
+  authMiddleware,
+  requireAdmin,
+  viewAllTrips
+);
+
+// view trip by id
+
+router.get(
+  "/trips/:id",
+  authMiddleware,
+  requireAdmin,
+  getTripById
 );
 
 

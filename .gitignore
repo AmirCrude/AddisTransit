@@ -2,6 +2,8 @@
 
 addis_transit.sql
 useThese
+prompt
+
 # Logs
 logs
 *.log

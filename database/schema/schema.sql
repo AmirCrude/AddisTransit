@@ -245,3 +245,53 @@ CREATE TABLE activity_logs (
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
+
+
+------------------------------------------------------------
+-- TRIPS TABLE
+------------------------------------------------------------
+
+CREATE TABLE trips (
+    trip_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    route_id INT NOT NULL,
+    bus_id INT NOT NULL,
+    agent_id INT NULL,
+
+    start_time DATETIME NULL,
+    end_time DATETIME NULL,
+
+    status ENUM(
+        'scheduled',
+        'in_progress',
+        'completed',
+        'cancelled'
+    ) NOT NULL DEFAULT 'scheduled',
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_trips_route
+        FOREIGN KEY (route_id)
+        REFERENCES bus_routes(route_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_trips_bus
+        FOREIGN KEY (bus_id)
+        REFERENCES buses(bus_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_trips_agent
+        FOREIGN KEY (agent_id)
+        REFERENCES users(user_id)
+        ON DELETE SET NULL,
+
+    KEY idx_trips_route (route_id),
+    KEY idx_trips_bus (bus_id),
+    KEY idx_trips_agent (agent_id),
+    KEY idx_trips_status (status),
+    KEY idx_trips_start_time (start_time)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+
+

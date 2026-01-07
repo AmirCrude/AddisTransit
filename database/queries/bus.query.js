@@ -62,6 +62,15 @@ const assignAgentToBus = async (busId, agentId) => {
   );
 };
 
+// get bus assigned to agent
+const getBusByAgentId = async (agentId) => {
+  const [rows] = await db.query(
+    "SELECT * FROM buses WHERE assigned_agent_id = ?",
+    [agentId]
+  );
+  return rows[0];
+};
+
 module.exports = {
   insertBus,
   getAllBuses,
@@ -70,4 +79,5 @@ module.exports = {
   updateBusStatus,
   assignBusToRoute,
   assignAgentToBus,
+  getBusByAgentId,
 };
