@@ -40,6 +40,9 @@ const {
   // agent assignment controller
   assignAgentToBus,
   
+  // Activity logs controller
+  getAllActivityLogs,
+  
 } = require("../controllers/admin.controller");
 
 // Validators
@@ -265,6 +268,15 @@ router.post(
   assignAgentToBus
 );
 
+// ================= ACTIVITY LOGS =================
+
+// get all activity logs
+router.get(
+  "/activity-logs",
+  authMiddleware,
+  requireAdmin,
+  getAllActivityLogs
+);
 
 
 module.exports = router;

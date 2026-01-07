@@ -206,3 +206,42 @@ CREATE TABLE buses (
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
+
+------------------------------------------------------------
+-- ACTIVITY LOGS TABLE
+------------------------------------------------------------
+
+CREATE TABLE activity_logs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    agent_id INT NOT NULL,
+    bus_id INT NOT NULL,
+    route_id INT NOT NULL,
+
+    action VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_activity_agent
+        FOREIGN KEY (agent_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_activity_bus
+        FOREIGN KEY (bus_id)
+        REFERENCES buses(bus_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_activity_route
+        FOREIGN KEY (route_id)
+        REFERENCES bus_routes(route_id)
+        ON DELETE CASCADE,
+
+    KEY idx_activity_agent (agent_id),
+    KEY idx_activity_bus (bus_id),
+    KEY idx_activity_route (route_id),
+    KEY idx_activity_created_at (created_at)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;

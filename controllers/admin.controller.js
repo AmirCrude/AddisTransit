@@ -3,6 +3,7 @@ const stationService = require("../services/station.service");
 const busStopService = require("../services/busStop.service");
 const routeService = require("../services/route.service");
 const { assignRouteToBus, busService, assignAgentToBusService } = require("../services/bus.service");
+const activityService = require("../services/activity.service");
 
 // Create agent invite
 const createAgentInviteController = async (req, res) => {
@@ -383,6 +384,23 @@ const assignAgentToBus = async (req, res) => {
   }
 };
 
+// Get all activity logs
+const getAllActivityLogs = async (req, res) => {
+  try {
+    const logs = await activityService.fetchAllLogs();
+
+    res.status(200).json({
+      status: "success",
+      data: logs,
+    });
+  } catch {
+    res.status(500).json({
+      status: "error",
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   // agent invites
   createAgentInvite: createAgentInviteController,
@@ -422,4 +440,7 @@ module.exports = {
   // assign agent to bus
   assignAgentToBus,
 
+  // activity logs
+  getAllActivityLogs,
 };
+
