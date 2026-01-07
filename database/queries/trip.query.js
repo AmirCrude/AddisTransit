@@ -23,7 +23,6 @@ const getActiveTripByAgent = async (agentId) => {
   );
   return rows[0];
 };
-
 // update trip
 const updateTripById = async (tripId, data) => {
   await db.query(
@@ -31,7 +30,6 @@ const updateTripById = async (tripId, data) => {
     [data, tripId]
   );
 };
-
 // ADMIN READ
 const getAllTrips = async () => {
   const [rows] = await db.query(`
@@ -48,7 +46,6 @@ const getAllTrips = async () => {
   `);
   return rows;
 };
-
 // Get single trip by ID (admin read-only)
 const getTripById = async (tripId) => {
   const [rows] = await db.query(
@@ -58,29 +55,49 @@ const getTripById = async (tripId) => {
       t.status,
       t.start_time,
       t.end_time,
-      t.created_at,
-
-      r.route_id,
-      r.name AS route_name,
 
       b.bus_id,
       b.plate_number,
+      b.capacity,
+      b.is_active,
 
-      u.user_id AS agent_id,
-      CONCAT(u.first_name, ' ', u.last_name) AS agent_name
+      origin_station.name AS origin,
+      destination_station.name AS destination
+
     FROM trips t
-    JOIN bus_routes r ON t.route_id = r.route_id
-    JOIN buses b ON t.bus_id = b.bus_id
-    LEFT JOIN users u ON t.agent_id = u.user_id
+    JOIN buses b ON b.bus_id = t.bus_id
+    JOIN bus_routes r ON r.route_id = t.route_id
+
+    JOIN route_stops rs_origin
+      ON rs_origin.route_id = r.route_id
+     AND rs_origin.stop_order = (
+       SELECT MIN(stop_order)
+       FROM route_stops
+       WHERE route_id = r.route_id
+     )
+
+    JOIN bus_stops origin_station
+      ON origin_station.stop_id = rs_origin.stop_id
+
+    JOIN route_stops rs_dest
+      ON rs_dest.route_id = r.route_id
+     AND rs_dest.stop_order = (
+       SELECT MAX(stop_order)
+       FROM route_stops
+       WHERE route_id = r.route_id
+     )
+
+    JOIN bus_stops destination_station
+      ON destination_station.stop_id = rs_dest.stop_id
+
     WHERE t.trip_id = ?
+    LIMIT 1
     `,
     [tripId]
   );
 
   return rows[0];
 };
-
-
 // get active trips by route
 const getActiveTripsByRoute = async (routeId) => {
     const [rows] = await db.query(
@@ -89,8 +106,7 @@ const getActiveTripsByRoute = async (routeId) => {
       [routeId]
     );
     return rows;
-  };
-
+};
 // COMMUTER READ
 const getTripsByRouteForCommuter = async (routeId) => {
   const [rows] = await db.query(
@@ -141,6 +157,52 @@ const getTripsByRouteForCommuter = async (routeId) => {
   return rows;
 };
 
+const getRouteStopsByTrip = async (tripId) => {
+  const [rows] = await db.query(
+    `
+    SELECT
+      bs.stop_id,
+      bs.name,
+      bs.latitude,
+      bs.longitude,
+      rs.stop_order
+
+    FROM trips t
+    JOIN route_stops rs ON rs.route_id = t.route_id
+    JOIN bus_stops bs ON bs.stop_id = rs.stop_id
+
+    WHERE t.trip_id = ?
+    ORDER BY rs.stop_order ASC
+    `,
+    [tripId]
+  );
+
+  return rows;
+};
+
+const getNextStopByTrip = async (tripId) => {
+  const [rows] = await db.query(
+    `
+    SELECT
+      bs.stop_id,
+      bs.name,
+      bs.latitude,
+      bs.longitude
+
+    FROM trips t
+    JOIN route_stops rs ON rs.route_id = t.route_id
+    JOIN bus_stops bs ON bs.stop_id = rs.stop_id
+
+    WHERE t.trip_id = ?
+    ORDER BY rs.stop_order ASC
+    LIMIT 1
+    `,
+    [tripId]
+  );
+
+  return rows[0] || null;
+};
+
 
 
 module.exports = {
@@ -151,4 +213,6 @@ module.exports = {
     getTripById,
     getActiveTripsByRoute,
     getTripsByRouteForCommuter,
+    getRouteStopsByTrip,
+    getNextStopByTrip,
 };

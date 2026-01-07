@@ -1,4 +1,4 @@
-const { getTripsByRouteForCommuter } = require("../database/queries/trip.query");
+const { getTripById, getTripsByRouteForCommuter, getRouteStopsByTrip, getNextStopByTrip } = require("../database/queries/trip.query");
 const { getBusesByRoute } = require("../database/queries/bus.query");
 
 const fetchTripsByRoute = async (routeId) => {
@@ -13,7 +13,39 @@ const fetchBusesByRoute = async (routeId) => {
     return await getBusesByRoute(routeId);
   };
   
+  const fetchTripDetails = async (tripId) => {
+    if (!tripId) throw new Error("Trip ID is required");
+  
+    const trip = await getTripById(tripId);
+    if (!trip) throw new Error("Trip not found");
+  
+    const routeStops = await getRouteStopsByTrip(tripId);
+    const nextStop = await getNextStopByTrip(tripId);
+  
+    return {
+      trip_id: trip.trip_id,
+      status: trip.status,
+      start_time: trip.start_time,
+      end_time: trip.end_time,
+  
+      bus: {
+        bus_id: trip.bus_id,
+        plate_number: trip.plate_number,
+        capacity: trip.capacity,
+        is_active: trip.is_active,
+      },
+  
+      origin: trip.origin,
+      destination: trip.destination,
+  
+      next_stop: nextStop,
+      route_stops: routeStops,
+    };
+  };
+  
+
 module.exports = {
     fetchTripsByRoute,
     fetchBusesByRoute,
+    fetchTripDetails,
 };

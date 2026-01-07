@@ -1,12 +1,14 @@
 const { 
     commuterQuery, getRouteSummaries, getStationSummaries, getBusesForCommuter 
 } = require("../database/queries/commuter.query");
-const { fetchTripsByRoute, fetchBusesByRoute } = require("../services/commuter.service");
+const { fetchTripsByRoute, fetchBusesByRoute, fetchTripDetails } = require("../services/commuter.service");
 
+// Commuter Controllers
 const getStations = async (req, res) => {
   res.json({ status: "success", data: await commuterQuery.getActiveStations() });
 };
 
+// Get stops for a specific station
 const getStationStops = async (req, res) => {
   res.json({
     status: "success",
@@ -14,10 +16,12 @@ const getStationStops = async (req, res) => {
   });
 };
 
+// Get all active routes
 const getRoutes = async (req, res) => {
   res.json({ status: "success", data: await commuterQuery.getActiveRoutes() });
 };
 
+// Get stops for a specific route
 const getRouteStops = async (req, res) => {
   res.json({
     status: "success",
@@ -25,6 +29,7 @@ const getRouteStops = async (req, res) => {
   });
 };
 
+// Get all active trips
 const getActiveTrips = async (req, res) => {
   res.json({
     status: "success",
@@ -32,7 +37,7 @@ const getActiveTrips = async (req, res) => {
   });
 };
 
-
+// Get route summaries
 const getRouteSummariesController = async (req, res) => {
   try {
     const routes = await getRouteSummaries();
@@ -49,6 +54,7 @@ const getRouteSummariesController = async (req, res) => {
   }
 };
 
+// Get station summaries
 const getStationSummariesController = async (req, res) => {
     try {
       const stations = await getStationSummaries();
@@ -65,7 +71,7 @@ const getStationSummariesController = async (req, res) => {
     }
   };
 
-  
+// Get buses for commuters
   const getBuses = async (req, res) => {
     try {
       const buses = await getBusesForCommuter();
@@ -82,7 +88,7 @@ const getStationSummariesController = async (req, res) => {
     }
   };
 
-
+// Get trips by route for commuters
 const getTripsByRoute = async (req, res) => {
   try {
     const trips = await fetchTripsByRoute(req.params.routeId);
@@ -99,7 +105,7 @@ const getTripsByRoute = async (req, res) => {
   }
 };
 
-
+// Get buses by route for commuters
 const getBusesByRoute = async (req, res) => {
   try {
     const buses = await fetchBusesByRoute(req.params.routeId);
@@ -116,6 +122,22 @@ const getBusesByRoute = async (req, res) => {
   }
 };
 
+// Get trip details for commuters
+const getTripDetails = async (req, res) => {
+  try {
+    const trip = await fetchTripDetails(req.params.tripId);
+
+    res.status(200).json({
+      status: "success",
+      data: trip,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
     getStations,
@@ -128,4 +150,5 @@ module.exports = {
     getBuses,
     getTripsByRoute,
     getBusesByRoute,
+    getTripDetails,
 };
