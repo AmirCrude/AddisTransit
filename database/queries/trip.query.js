@@ -81,22 +81,74 @@ const getTripById = async (tripId) => {
 };
 
 
+// get active trips by route
+const getActiveTripsByRoute = async (routeId) => {
+    const [rows] = await db.query(
+      `SELECT * FROM trips 
+       WHERE route_id = ? AND status = 'in_progress'`,
+      [routeId]
+    );
+    return rows;
+  };
+
+// COMMUTER READ
+const getTripsByRouteForCommuter = async (routeId) => {
+  const [rows] = await db.query(
+    `
+    SELECT
+      t.trip_id,
+      t.status,
+      t.start_time,
+
+      b.bus_id,
+      b.plate_number,
+
+      origin_station.name AS origin_station,
+      destination_station.name AS destination_station
+    FROM trips t
+    JOIN buses b ON t.bus_id = b.bus_id
+    JOIN bus_routes r ON t.route_id = r.route_id
+
+    -- origin
+    JOIN route_stops rs_start 
+      ON rs_start.route_id = r.route_id
+     AND rs_start.stop_order = 1
+    JOIN bus_stops bs_start 
+      ON rs_start.stop_id = bs_start.stop_id
+    JOIN stations origin_station 
+      ON bs_start.station_id = origin_station.station_id
+
+    -- destination
+    JOIN route_stops rs_end 
+      ON rs_end.route_id = r.route_id
+     AND rs_end.stop_order = (
+        SELECT MAX(stop_order)
+        FROM route_stops
+        WHERE route_id = r.route_id
+     )
+    JOIN bus_stops bs_end 
+      ON rs_end.stop_id = bs_end.stop_id
+    JOIN stations destination_station 
+      ON bs_end.station_id = destination_station.station_id
+
+    WHERE t.route_id = ?
+      AND t.status = 'in_progress'
+    ORDER BY t.start_time ASC
+    `,
+    [routeId]
+  );
+
+  return rows;
+};
+
+
+
 module.exports = {
     insertTrip,
-    getTripById,
     getActiveTripByAgent,
     updateTripById,
     getAllTrips,
     getTripById,
+    getActiveTripsByRoute,
+    getTripsByRouteForCommuter,
 };
-
-
-// // get active trips by route
-// const getActiveTripsByRoute = async (routeId) => {
-//     const [rows] = await db.query(
-//       `SELECT * FROM trips 
-//        WHERE route_id = ? AND status = 'in_progress'`,
-//       [routeId]
-//     );
-//     return rows;
-//   };
