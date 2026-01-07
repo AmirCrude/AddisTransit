@@ -255,33 +255,6 @@ const getRouteSummaries = async () => {
     return rows;
   };
 
-  const getBusesByRoute = async (routeId) => {
-    const [rows] = await db.query(
-      `
-      SELECT
-        b.bus_id,
-        b.plate_number,
-        b.status,
-  
-        t.trip_id AS active_trip_id
-  
-      FROM buses b
-      JOIN bus_routes br
-        ON br.bus_id = b.bus_id
-  
-      LEFT JOIN trips t
-        ON t.bus_id = b.bus_id
-       AND t.status IN ('scheduled', 'in_progress')
-  
-      WHERE br.route_id = ?
-      ORDER BY b.plate_number
-      `,
-      [routeId]
-    );
-  
-    return rows;
-  };
-  
 module.exports = {
     getActiveStations,
     getStopsByStation,
@@ -292,5 +265,4 @@ module.exports = {
     getStationSummaries,
     getBusesForCommuter,
     getTripsByRoute,
-    getBusesByRoute,
 };

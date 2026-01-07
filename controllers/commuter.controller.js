@@ -1,7 +1,7 @@
 const { 
     commuterQuery, getRouteSummaries, getStationSummaries, getBusesForCommuter 
 } = require("../database/queries/commuter.query");
-const { fetchTripsByRoute } = require("../services/commuter.service");
+const { fetchTripsByRoute, fetchBusesByRoute } = require("../services/commuter.service");
 
 const getStations = async (req, res) => {
   res.json({ status: "success", data: await commuterQuery.getActiveStations() });
@@ -100,6 +100,23 @@ const getTripsByRoute = async (req, res) => {
 };
 
 
+const getBusesByRoute = async (req, res) => {
+  try {
+    const buses = await fetchBusesByRoute(req.params.routeId);
+
+    res.status(200).json({
+      status: "success",
+      data: buses,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+
 module.exports = {
     getStations,
     getStationStops,
@@ -110,4 +127,5 @@ module.exports = {
     getStationSummariesController,
     getBuses,
     getTripsByRoute,
+    getBusesByRoute,
 };

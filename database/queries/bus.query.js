@@ -71,6 +71,33 @@ const getBusByAgentId = async (agentId) => {
   return rows[0];
 };
 
+// get buses by route for commuter
+const getBusesByRoute = async (routeId) => {
+  const [rows] = await db.query(
+    `
+    SELECT
+      b.bus_id,
+      b.plate_number,
+      b.is_active,
+
+      t.trip_id AS active_trip_id
+
+    FROM buses b
+    LEFT JOIN trips t
+      ON t.bus_id = b.bus_id
+     AND t.status IN ('scheduled', 'in_progress')
+
+    WHERE b.route_id = ?
+    ORDER BY b.plate_number
+    `,
+    [routeId]
+  );
+
+  return rows;
+};
+
+
+
 module.exports = {
   insertBus,
   getAllBuses,
@@ -80,4 +107,5 @@ module.exports = {
   assignBusToRoute,
   assignAgentToBus,
   getBusByAgentId,
+  getBusesByRoute,
 };
