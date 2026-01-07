@@ -2,7 +2,8 @@ const { createAgentInvite } = require("../services/admin.invite.service");
 const stationService = require("../services/station.service");
 const busStopService = require("../services/busStop.service");
 const routeService = require("../services/route.service");
-const busService = require("../services/bus.service");
+const { assignRouteToBus, busService } = require("../services/bus.service");
+
 
 const createAgentInviteController = async (req, res) => {
   try {
@@ -348,6 +349,22 @@ const updateBusStatus = async (req, res) => {
   }
 };
 
+// Assign bus to route
+const assignBusToRouteController = async (req, res) => {
+  try {
+    await assignRouteToBus(req.body);
+
+    res.status(200).json({
+      status: "success",
+      message: "Bus assigned to route successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
 
 
 module.exports = {
@@ -382,4 +399,8 @@ module.exports = {
   getBus,
   updateBus,
   updateBusStatus,
+
+  // assign bus to route
+  assignBusToRoute: assignBusToRouteController,
+
 };

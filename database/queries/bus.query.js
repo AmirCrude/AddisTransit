@@ -46,10 +46,20 @@ const updateBusStatus = async (busId, isActive) => {
   );
 };
 
+// assign bus to route
+const assignBusToRoute = async (busId, routeId) => {
+  await db.query(
+    "UPDATE buses SET route_id = ? WHERE bus_id = ?",
+    [routeId, busId]
+  );
+};
+
+
 module.exports = {
   insertBus,
   getAllBuses,
   getBusById,
   updateBusById,
   updateBusStatus,
+  assignBusToRoute,
 };

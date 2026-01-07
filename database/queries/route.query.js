@@ -11,6 +11,14 @@ const getAllRoutes = async () => {
   return rows;
 };
 
+const getRouteById = async (routeId) => {
+  const [rows] = await db.query(
+    "SELECT * FROM bus_routes WHERE route_id = ?",
+    [routeId]
+  );
+  return rows[0];
+};
+
 const getRouteByName = async (name) => {
   const [rows] = await db.query(
     "SELECT * FROM bus_routes WHERE name = ?",
@@ -62,6 +70,7 @@ module.exports = {
   insertRoute,
   getAllRoutes,
   getRouteByName,
+  getRouteById,
   updateRouteById,
   updateRouteStatus,
   insertRouteStop,

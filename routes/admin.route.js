@@ -33,6 +33,9 @@ const {
   getBus,
   updateBus,
   updateBusStatus,
+
+  // bus assignment controller
+  assignBusToRoute,
   
 } = require("../controllers/admin.controller");
 
@@ -41,13 +44,12 @@ const { validateCreateStation } = require("../middlewares/validators/station.val
 const { validateCreateBusStop } = require("../middlewares/validators/busStop.validate");
 const { validateCreateRoute, validateAddRouteStops } = require("../middlewares/validators/route.validate");
 const { validateCreateBus } = require("../middlewares/validators/bus.validate");
+const { validateAssignBusToRoute } = require("../middlewares/validators/bus.assign.validate");
 
 // Authentication & Role
 const { authMiddleware } = require("../middlewares/auth/auth.middleware");
 const { requireAdmin } = require("../middlewares/auth/admin.auth.middleware");
-const { checkJson } = require("../middlewares/auth/checkJson.middleware");
-
-// 
+const { checkJson } = require("../middlewares/auth/checkJson.middleware"); 
 
 // ================= ADMIN ROUTES =================
 
@@ -238,6 +240,15 @@ router.patch(
   updateBusStatus
 );
 
+// Assign bus to route
+router.post(
+  "/buses/assign-route",
+  authMiddleware,
+  requireAdmin,
+  checkJson,
+  validateAssignBusToRoute,
+  assignBusToRoute
+);
 
 
 
