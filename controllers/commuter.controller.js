@@ -139,16 +139,36 @@ const getTripDetails = async (req, res) => {
   }
 };
 
+const { fetchTripMap } = require("../services/commuter.service");
+
+const getTripMap = async (req, res) => {
+  try {
+    const map = await fetchTripMap(req.params.tripId);
+
+    res.status(200).json({
+      status: "success",
+      data: map,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+
 module.exports = {
-    getStations,
-    getStationStops,
-    getRoutes,
-    getRouteStops,
-    getActiveTrips,
-    getRouteSummariesController,
-    getStationSummariesController,
-    getBuses,
-    getTripsByRoute,
-    getBusesByRoute,
-    getTripDetails,
+  getStations,
+  getStationStops,
+  getRoutes,
+  getRouteStops,
+  getActiveTrips,
+  getRouteSummariesController,
+  getStationSummariesController,
+  getBuses,
+  getTripsByRoute,
+  getBusesByRoute,
+  getTripDetails,
+  getTripMap,
 };

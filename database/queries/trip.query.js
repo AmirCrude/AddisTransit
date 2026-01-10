@@ -203,6 +203,28 @@ const getNextStopByTrip = async (tripId) => {
   return rows[0] || null;
 };
 
+const getRouteStopsForMap = async (tripId) => {
+  const [rows] = await db.query(
+    `
+    SELECT
+      bs.stop_id,
+      bs.name,
+      bs.latitude,
+      bs.longitude,
+      rs.stop_order
+
+    FROM trips t
+    JOIN route_stops rs ON rs.route_id = t.route_id
+    JOIN bus_stops bs ON bs.stop_id = rs.stop_id
+
+    WHERE t.trip_id = ?
+    ORDER BY rs.stop_order ASC
+    `,
+    [tripId]
+  );
+
+  return rows;
+};
 
 
 module.exports = {
@@ -215,4 +237,5 @@ module.exports = {
     getTripsByRouteForCommuter,
     getRouteStopsByTrip,
     getNextStopByTrip,
+    getRouteStopsForMap,
 };

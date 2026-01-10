@@ -42,10 +42,31 @@ const fetchBusesByRoute = async (routeId) => {
       route_stops: routeStops,
     };
   };
-  
+
+  const { getRouteStopsForMap } = require("../database/queries/trip.query");
+
+const fetchTripMap = async (tripId) => {
+  if (!tripId) throw new Error("Trip ID is required");
+
+  const stops = await getRouteStopsForMap(tripId);
+  if (stops.length === 0) throw new Error("Trip not found");
+
+  const path = stops.map((stop) => ({
+    latitude: stop.latitude,
+    longitude: stop.longitude,
+  }));
+
+  return {
+    trip_id: Number(tripId),
+    path,
+    stops,
+  };
+};
+
 
 module.exports = {
-    fetchTripsByRoute,
-    fetchBusesByRoute,
-    fetchTripDetails,
+  fetchTripsByRoute,
+  fetchBusesByRoute,
+  fetchTripDetails,
+  fetchTripMap,
 };

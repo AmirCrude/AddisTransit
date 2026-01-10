@@ -13,6 +13,7 @@ const {
     getTripsByRoute,
     getBusesByRoute,
     getTripDetails,
+    getTripMap,
 } = require("../controllers/commuter.controller");
 
 router.get("/stations", getStations);
@@ -34,4 +35,7 @@ router.get("/routes/:routeId/trips", getTripsByRoute );
 router.get("/routes/:routeId/buses", getBusesByRoute);
 
 router.get("/trips/:tripId", getTripDetails);
+
+router.get("/trips/:tripId/map", getTripMap);
+
 module.exports = router;
