@@ -3,6 +3,7 @@ const {
     getTripById,
     getActiveTripByAgent,
     updateTripById,
+    getTripByIdInternal,
 } = require("../database/queries/trip.query");
 
 const { getBusByAgentId } = require("../database/queries/bus.query");
@@ -31,7 +32,7 @@ const { getBusByAgentId } = require("../database/queries/bus.query");
   
   // start trip
   const startTripByAgent = async (tripId, agentId) => {
-    const trip = await getTripById(tripId);
+    const trip = await getTripByIdInternal(tripId);
     if (!trip) throw new Error("Trip not found");
   
     if (trip.agent_id !== agentId) {
@@ -50,7 +51,7 @@ const { getBusByAgentId } = require("../database/queries/bus.query");
   
   // complete trip
   const completeTripByAgent = async (tripId, agentId) => {
-    const trip = await getTripById(tripId);
+    const trip = await getTripByIdInternal(tripId);
     if (!trip) throw new Error("Trip not found");
   
     if (trip.agent_id !== agentId) {

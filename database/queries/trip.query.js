@@ -6,19 +6,10 @@ const insertTrip = async (data) => {
   return res.insertId;
 };
 
-// get trip by id
-// const getTripById = async (tripId) => {
-//   const [rows] = await db.query(
-//     "SELECT * FROM trips WHERE trip_id = ?",
-//     [tripId]
-//   );
-//   return rows[0];
-// };
-
 // get agent active trip
 const getActiveTripByAgent = async (agentId) => {
   const [rows] = await db.query(
-    "SELECT * FROM trips WHERE agent_id = ? AND status = 'in_progress'",
+    "SELECT * FROM trips WHERE agent_id = ? AND status IN ('scheduled', 'in_progress') ORDER BY created_at DESC LIMIT 1",
     [agentId]
   );
   return rows[0];
@@ -290,6 +281,16 @@ const getActiveTrips = async (searchTerm = null) => {
   return rows;
 };
 
+// INTERNAL (agent/admin logic)
+const getTripByIdInternal = async (tripId) => {
+  const [rows] = await db.query(
+    `SELECT * FROM trips WHERE trip_id = ? LIMIT 1`,
+    [tripId]
+  );
+  return rows[0];
+};
+
+
 
 
 module.exports = {
@@ -304,4 +305,5 @@ module.exports = {
     getNextStopByTrip,
     getRouteStopsForMap,
     getActiveTrips,
+    getTripByIdInternal,
 };
