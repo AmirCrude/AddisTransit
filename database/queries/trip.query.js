@@ -226,6 +226,71 @@ const getRouteStopsForMap = async (tripId) => {
   return rows;
 };
 
+const getActiveTrips = async (searchTerm = null) => {
+  const params = [];
+  let searchClause = "";
+
+  if (searchTerm) {
+    searchClause = `
+      AND (
+        origin_station.name LIKE ?
+        OR destination_station.name LIKE ?
+      )
+    `;
+    params.push(`%${searchTerm}%`, `%${searchTerm}%`);
+  }
+
+  const [rows] = await db.query(
+    `
+    SELECT
+      t.trip_id,
+      t.status,
+      t.start_time,
+
+      b.plate_number AS bus_plate,
+
+      r.route_id,
+
+      origin_station.name AS origin,
+      destination_station.name AS destination
+
+    FROM trips t
+    JOIN buses b ON b.bus_id = t.bus_id
+    JOIN bus_routes r ON r.route_id = t.route_id
+
+    JOIN route_stops rs_origin
+      ON rs_origin.route_id = r.route_id
+     AND rs_origin.stop_order = (
+        SELECT MIN(stop_order)
+        FROM route_stops
+        WHERE route_id = r.route_id
+     )
+
+    JOIN bus_stops origin_station
+      ON origin_station.stop_id = rs_origin.stop_id
+
+    JOIN route_stops rs_dest
+      ON rs_dest.route_id = r.route_id
+     AND rs_dest.stop_order = (
+        SELECT MAX(stop_order)
+        FROM route_stops
+        WHERE route_id = r.route_id
+     )
+
+    JOIN bus_stops destination_station
+      ON destination_station.stop_id = rs_dest.stop_id
+
+    WHERE t.status = 'in_progress'
+    ${searchClause}
+    ORDER BY t.start_time DESC
+    `,
+    params
+  );
+
+  return rows;
+};
+
+
 
 module.exports = {
     insertTrip,
@@ -238,4 +303,5 @@ module.exports = {
     getRouteStopsByTrip,
     getNextStopByTrip,
     getRouteStopsForMap,
+    getActiveTrips,
 };

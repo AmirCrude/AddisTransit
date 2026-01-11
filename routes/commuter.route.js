@@ -6,7 +6,6 @@ const {
     getStationStops,
     getRoutes,
     getRouteStops,
-    getActiveTrips,
     getStationSummariesController,
     getRouteSummariesController,
     getBuses,
@@ -14,6 +13,7 @@ const {
     getBusesByRoute,
     getTripDetails,
     getTripMap,
+    getActiveTrips,
 } = require("../controllers/commuter.controller");
 
 router.get("/stations", getStations);
@@ -21,8 +21,6 @@ router.get("/stations/:id/stops", getStationStops);
 
 router.get("/routes", getRoutes);
 router.get("/routes/:id/stops", getRouteStops);
-
-router.get("/trips/active", getActiveTrips);
 
 router.get("/routes/summary", getRouteSummariesController);
 
@@ -34,6 +32,7 @@ router.get("/routes/:routeId/trips", getTripsByRoute );
 
 router.get("/routes/:routeId/buses", getBusesByRoute);
 
+router.get("/trips/active", getActiveTrips);
 router.get("/trips/:tripId", getTripDetails);
 
 router.get("/trips/:tripId/map", getTripMap);

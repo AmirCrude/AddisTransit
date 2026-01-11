@@ -1,7 +1,17 @@
 const { 
-    commuterQuery, getRouteSummaries, getStationSummaries, getBusesForCommuter 
+    commuterQuery,
+    getRouteSummaries,
+    getStationSummaries,
+    getBusesForCommuter, 
 } = require("../database/queries/commuter.query");
-const { fetchTripsByRoute, fetchBusesByRoute, fetchTripDetails } = require("../services/commuter.service");
+const {
+  fetchTripsByRoute,
+  fetchBusesByRoute,
+  fetchTripDetails,
+  fetchActiveTrips,
+  fetchTripMap,
+} = require("../services/commuter.service");
+
 
 // Commuter Controllers
 const getStations = async (req, res) => {
@@ -29,13 +39,6 @@ const getRouteStops = async (req, res) => {
   });
 };
 
-// Get all active trips
-const getActiveTrips = async (req, res) => {
-  res.json({
-    status: "success",
-    data: await commuterQuery.getActiveTrips(),
-  });
-};
 
 // Get route summaries
 const getRouteSummariesController = async (req, res) => {
@@ -139,7 +142,6 @@ const getTripDetails = async (req, res) => {
   }
 };
 
-const { fetchTripMap } = require("../services/commuter.service");
 
 const getTripMap = async (req, res) => {
   try {
@@ -157,13 +159,28 @@ const getTripMap = async (req, res) => {
   }
 };
 
+const getActiveTrips = async (req, res) => {
+  try {
+    const trips = await fetchActiveTrips(req.query.q);
+
+    res.status(200).json({
+      status: "success",
+      data: trips,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
 
 module.exports = {
   getStations,
   getStationStops,
   getRoutes,
   getRouteStops,
-  getActiveTrips,
   getRouteSummariesController,
   getStationSummariesController,
   getBuses,
@@ -171,4 +188,6 @@ module.exports = {
   getBusesByRoute,
   getTripDetails,
   getTripMap,
+  getActiveTrips,
 };
+
