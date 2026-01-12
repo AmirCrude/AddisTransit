@@ -2,20 +2,19 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const http = require("http");
 
 // Internal Modules
 const mainRouter = require("./routes/router");
 const { testAllConnections } = require("./utils/connection/connections");
+const initSocket = require("./socket"); // 👈 NEW
 
 // App Initialization
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// Allowed origin from environment
 const CLIENT_URL = process.env.CLIENT_URL;
 
-// CORS configuration
-
+// CORS
 app.use(
   cors({
     origin: CLIENT_URL,
@@ -25,21 +24,21 @@ app.use(
   })
 );
 
-app.use(cors({ origin: CLIENT_URL, credentials: true }));
-
-
-// JSON parser
 app.use(express.json());
 
-
-// Test database connection
+// DB test
 testAllConnections();
-
 
 // Routes
 app.use("/api", mainRouter);
 
-// Server listener
-app.listen(PORT, () => {
+// 🔥 CREATE HTTP SERVER
+const server = http.createServer(app);
+
+// 🔥 INIT SOCKET.IO
+initSocket(server);
+
+// 🔥 START SERVER
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

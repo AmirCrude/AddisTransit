@@ -12,6 +12,7 @@ const getActiveTripByAgent = async (agentId) => {
     "SELECT * FROM trips WHERE agent_id = ? AND status IN ('in_progress', 'scheduled') ORDER BY created_at DESC LIMIT 1",
     [agentId]
   );
+  
   return rows[0];
 };
 // update trip
