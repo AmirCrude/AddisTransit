@@ -68,6 +68,57 @@ const { getBusByAgentId } = require("../database/queries/bus.query");
     });
   };
 
+// cancel trip
+const cancelTripByAgent = async (tripId, agentId) => {
+    const trip = await getTripByIdInternal(tripId);
+    if (!trip) throw new Error("Trip not found");
+  
+    if (trip.agent_id !== agentId) {
+      throw new Error("Unauthorized trip access");
+    }
+  
+    await updateTripById(tripId, {
+      status: "cancelled",
+      end_time: new Date(),
+    });
+  };
+
+// pause trip
+const pauseTripByAgent = async (tripId, agentId) => {
+    const trip = await getTripByIdInternal(tripId);
+    if (!trip) throw new Error("Trip not found");
+  
+    if (trip.agent_id !== agentId) {
+      throw new Error("Unauthorized trip access");
+    }
+  
+    // if (trip.status === "in_progress") {
+    //   throw new Error("Trip cannot be paused");
+    // }
+  
+    await updateTripById(tripId, {
+      status: "scheduled",
+    });
+  }
+
+// resume trip
+const resumeTripByAgent = async (tripId, agentId) => {
+    const trip = await getTripByIdInternal(tripId);
+    if (!trip) throw new Error("Trip not found");
+  
+    if (trip.agent_id !== agentId) {
+      throw new Error("Unauthorized trip access");
+    }
+  
+    if (trip.status !== "scheduled") {
+      throw new Error("Trip cannot be resumed");
+    }
+  
+    await updateTripById(tripId, {
+      status: "in_progress",
+    });
+  }
+
   
   const fetchTripByIdForAdmin = async (tripId) => {
     const trip = await getTripById(tripId);
@@ -87,5 +138,8 @@ module.exports = {
     getActiveTripByAgent,
     getTripById,
     fetchTripByIdForAdmin,
+    cancelTripByAgent,
+    pauseTripByAgent,
+    resumeTripByAgent,
   };
   

@@ -56,6 +56,59 @@ const completeTrip = async (req, res) => {
   }
 };
 
+// cancel trip
+
+const cancelTrip = async (req, res) => {
+  try {
+    await tripService.cancelTripByAgent(req.params.id, req.user.id);
+
+    res.status(200).json({
+      status: "success",
+      message: "Trip cancelled",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+// pause trip
+
+const pauseTrip = async (req, res) => {
+  try {
+    await tripService.pauseTripByAgent(req.params.id, req.user.id);
+
+    res.status(200).json({
+      status: "success",
+      message: "Trip paused",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+}
+
+// resume trip
+const resumeTrip = async (req, res) => {
+  try {
+    await tripService.resumeTripByAgent(req.params.id, req.user.id);
+
+    res.status(200).json({
+      status: "success",
+      message: "Trip resumed",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
 // get active trip
 const getActiveTrip = async (req, res) => {
   try {
@@ -78,4 +131,7 @@ module.exports = {
   startTrip,
   completeTrip,
   getActiveTrip,
+  cancelTrip,
+  pauseTrip,
+  resumeTrip,
 };

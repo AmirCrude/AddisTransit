@@ -6,10 +6,14 @@ const {
   startTrip,
   completeTrip,
   getActiveTrip,
+  cancelTrip,
+  pauseTrip,
+  resumeTrip
 } = require("../controllers/agent.controller");
 
 const { authMiddleware } = require("../middlewares/auth/auth.middleware");
 const { requireAgent } = require("../middlewares/auth/agent.auth.middleware");
+const { resume } = require("../configs/database.config");
 
 // get active trip
 router.get(
@@ -42,5 +46,31 @@ router.patch(
   requireAgent,
   completeTrip
 );
+
+// cancel trip
+router.patch(
+  "/trips/:id/cancel",
+  authMiddleware,
+  requireAgent,
+  cancelTrip
+)
+
+// pause trip
+router.patch(
+  "/trips/:id/pause",
+  authMiddleware,
+  requireAgent,
+  pauseTrip
+)
+
+// resume trip
+router.patch(
+  "/trips/:id/resume",
+  authMiddleware,
+  requireAgent,
+  resumeTrip
+)
+
+
 
 module.exports = router;

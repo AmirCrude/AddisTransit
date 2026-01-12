@@ -9,7 +9,7 @@ const insertTrip = async (data) => {
 // get agent active trip
 const getActiveTripByAgent = async (agentId) => {
   const [rows] = await db.query(
-    "SELECT * FROM trips WHERE agent_id = ? AND status IN ('scheduled', 'in_progress') ORDER BY created_at DESC LIMIT 1",
+    "SELECT * FROM trips WHERE agent_id = ? AND status IN ('in_progress', 'scheduled') ORDER BY created_at DESC LIMIT 1",
     [agentId]
   );
   return rows[0];
